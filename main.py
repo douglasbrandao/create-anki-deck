@@ -11,10 +11,12 @@ parser = argparse.ArgumentParser(
                     prog='Create Anki Deck',
                     description='Program creates a apkg deck file')
 
+
 def check_file_extension(filename: str):
     if not filename.endswith('.csv'):
         parser.error('argument must have a .csv extension')
     return filename
+
 
 parser.add_argument('-d', '--deck', required=True)
 parser.add_argument('-l', '--lang', required=True)
@@ -28,8 +30,10 @@ cwd = Path.cwd()
 sounds_dir = cwd / 'sounds'
 sounds_dir.mkdir(exist_ok=True)
 
+
 def generate_id():
     return random.randint(10000, 99999)
+
 
 deck = genanki.Deck(
     generate_id(),
@@ -54,19 +58,27 @@ model = genanki.Model(
     },
   ])
 
+
 def create_audio_file(sentence: str, audio_path: str, lang: str) -> None:
     tts = gTTS(sentence, lang=lang)
     tts.save(audio_path)
 
+
 def add_audio_path_to_package_media_files(audio_path: str) -> None:
     package.media_files.append(audio_path)
 
+
 def create_card(sentence: str, translation: str, file: str) -> None:
-    note = genanki.Note(model=model, fields=[sentence, translation, f'[sound:{file}]'])
+    note = genanki.Note(
+        model=model,
+        fields=[sentence, translation, f'[sound:{file}]']
+    )
     deck.add_note(note)
+
 
 def remove_special_chars(text: str) -> str:
     return re.sub(r'[.,!¿?/\'-="\\]', '', text)
+
 
 with open(cwd / f'{args.csv}', 'r') as file:
     reader = csv.reader(file, delimiter=';')
